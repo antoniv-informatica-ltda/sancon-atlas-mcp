@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "atlas": {
+      "type": "http",
+      "url": "https://app-sancon-platform-prod-brs.azurewebsites.net/mcp",
+      "oauth": {
+        "clientId": "mcp-local"
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "sancon",
+  "description": "Plugins da Sancon para agentes de IA.",
+  "owner": {
+    "name": "Grupo Sancon"
+  },
+  "plugins": [
+    {
+      "name": "atlas",
+      "source": "./plugins/atlas",
+      "description": "Dicionário de dados e Painéis do Atlas (Sancon) sobre o ERP e o HCM Senior da sua empresa."
+    }
+  ]
+}

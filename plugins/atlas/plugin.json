@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "atlas",
+  "version": "1.0.0",
+  "description": "Dicionário de dados e Painéis do Atlas (Sancon) sobre o ERP e o HCM Senior da sua empresa.",
+  "author": {
+    "name": "Grupo Sancon",
+    "url": "https://github.com/antoniv-informatica-ltda/sancon-atlas-mcp"
+  },
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Atlas — Sancon",
+        "shortDescription": "Painéis sobre o ERP e o HCM Senior",
+        "developerName": "Grupo Sancon",
+        "category": "Productivity",
+        "websiteURL": "https://github.com/antoniv-informatica-ltda/sancon-atlas-mcp"
+      }
+    }
+  }
+}
