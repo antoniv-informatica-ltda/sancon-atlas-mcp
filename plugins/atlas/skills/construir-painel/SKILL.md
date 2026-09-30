@@ -38,8 +38,9 @@ Rascunho abriu. Nenhuma ferramenta publica, e não tente contornar isso.
    Rascunho dela. Teste cada SELECT com `run_select` e grave as operações com `update_api_draft`
    (passe a `version` lida; se mudou, leia de novo com `read_api_draft`). Uma operação tem `key`,
    `sql`, `inputs` (`key` e `type`: `string`, `number` ou `date`), `columns` (`name` e `type`),
-   `pageSize` e, num ranking, `orderBy`. O retorno traz `problems`, que impedem publicar: corrija cada
-   um e grave de novo. `hints` não impedem nada, mas leia.
+   `pageSize` e, num ranking, `orderBy`. Entrada `string` ou `number` que pode ficar vazia ("todas as
+   empresas") leva `optional: true`. O retorno traz `problems`, que impedem publicar: corrija cada um
+   e grave de novo. `hints` não impedem nada, mas leia.
 9. **Monte o Painel.** `update_draft` com a definição inteira: `filters`, `queries` e `widgets`. Cada
    Consulta é `{ key, kind: "webservice", api, operation, params, columns }`. Deixe `version` de fora: a
    publicação usa a Versão que o seu Rascunho de API cria, ou a última no ar. O retorno também traz
@@ -55,6 +56,11 @@ Rascunho abriu. Nenhuma ferramenta publica, e não tente contornar isso.
   `orderBy` aparece ordenado pela primeira coluna.
 - Entrada entra como `:chave` e precisa estar em `inputs`. Toda entrada precisa de um filtro do Painel
   **com o mesmo nome**, listado em `params` da Consulta: a entrada não tem valor padrão.
+- Entrada sem valor chega à operação como `0` (number) ou `''` (string), e `WHERE CodEmp = :empresa`
+  devolve zero linhas. Se "todas" faz sentido (empresa, filial, cliente), marque a entrada com
+  `optional: true` e use-a **só** como `coluna = :chave` ou `coluna LIKE :chave`: o Atlas troca por
+  `(vazio OR coluna = :chave)`. Piso ou faixa (`>= :minimo`, `BETWEEN`) não é opcional; `date` também
+  não (tem `default` relativo).
 - Escolha só as colunas que o widget usa; nomeie cada uma em `columns` da operação, com o mesmo tipo e
   a mesma grafia na Consulta.
 
@@ -67,8 +73,15 @@ Rascunho abriu. Nenhuma ferramenta publica, e não tente contornar isso.
   valor da coluna naquela linha (o código do cliente, não o nome), e o resto do Painel relê.
 - Coluna `number` da Consulta leva `format`: `money` (R$), `integer`, `percent` (o valor já em pontos
   percentuais) ou `code` (código, sem separador de milhar).
-- Filtro com `options: { query, value, label }` vira lista: `query` é uma Consulta sem `params`, `value`
-  a coluna com o tipo do filtro e `label` a que aparece.
+- Filtro com `options` vira lista. Empresa e filial vêm do catálogo do Atlas, sem consulta ao ERP:
+  filtro `number` com `options: { catalog: "company" }` e, para a filial,
+  `options: { catalog: "branch", parent: "empresa" }` (a filial segue a empresa escolhida). Qualquer
+  outra lista é `options: { query, value, label }`: `query` é uma Consulta sem `params`, `value` a
+  coluna com o tipo do filtro e `label` a que aparece.
+- Todo widget aceita `cols` (3 a 12, na grade de 12) e `color` (`navy`, `purple`, `teal`, `orange`,
+  `green`, `rose`, `slate`, `gold`). Os widgets saem na ordem da lista. Sem `cols`: KPI ocupa 3,
+  gráfico 6 (12 se for o único), tabela 12. `color` pinta o filete do KPI e a série de `bar` e `line`;
+  `pie` usa a paleta inteira.
 
 ## Um Painel que se lê de relance
 
@@ -79,9 +92,14 @@ Rascunho abriu. Nenhuma ferramenta publica, e não tente contornar isso.
 - A tabela por último, para o detalhe.
 - Filtro de período sempre: dois filtros `date` (`dataInicial`, `dataFinal`), usados como entradas das
   operações, com `default` relativo — `startOfYear` e `today` (ou `startOfMonth`). Data fixa no
-  `default` faz o Painel publicado abrir para sempre no mesmo período. Empresa e filial como lista
-  (`options`).
+  `default` faz o Painel publicado abrir para sempre no mesmo período.
+- Empresa e filial do catálogo (`options.catalog`), e o Painel tem de **abrir com dado**: ou o filtro
+  tem `default` (a empresa principal), ou a entrada correspondente é `optional` e o vazio é "todas".
+  Sem um dos dois, o Painel abre vazio até alguém escolher.
 - `format` em toda coluna `number`.
+- Layout: 3 ou 4 KPIs de `cols: 3` na primeira linha; ranking longo em `bar` com `cols: 12`; dois
+  gráficos curtos lado a lado com `cols: 6`; a tabela em `cols: 12` no fim. Uma `color` diferente por
+  KPI quando eles medem coisas diferentes.
 
 ## O que não fazer
 
